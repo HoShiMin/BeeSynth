@@ -1,0 +1,5 @@
+[package]
+name = "note"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Alexander Eremeev @ HoShiMin <aleksanderem@yandex.ru>" ]

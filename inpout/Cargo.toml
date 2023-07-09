@@ -1,0 +1,15 @@
+[package]
+name = "inpout"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Alexander Eremeev @ HoShiMin <aleksanderem@yandex.ru>" ]
+
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.48"
+features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem"
+]
+
+[dependencies]
+winapi = { path = "../winapi" }

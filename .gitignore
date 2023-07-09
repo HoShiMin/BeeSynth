@@ -1,0 +1,14 @@
+/.vscode
+
+# Rust-specific files:
+Cargo.lock
+/target
+
+# Ignore all test sound files:
+*.wav
+*.mp3
+*.flac
+*.ogg
+*.aac
+*.midi
+*.xm

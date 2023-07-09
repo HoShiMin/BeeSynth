@@ -1,0 +1,64 @@
+[package]
+name = "beesynth"
+version = "0.1.0"
+edition = "2021"
+
+# Not implemented yet:
+# [lib]
+# crate-type = ["cdylib"]
+
+[profile.dev]
+opt-level = 0
+
+[profile.release]
+opt-level = 3
+lto = true
+debug = 0
+strip = true
+panic = "abort"
+
+[target.'cfg(windows)'.dependencies.windows]
+version = "0.48"
+features = [
+    "Win32_Foundation",
+    "Win32_Storage_FileSystem",
+    "Win32_Security",
+    "Win32_System_IO",
+    "Win32_System_Ioctl",
+    "Win32_System_Services",
+    "Win32_System_Threading",
+    "Win32_System_Diagnostics_Debug",
+    "Win32_System_Kernel",
+    "Win32_System_SystemInformation",
+    "Win32_System_Registry",
+    "Win32_System_Memory",
+    "Win32_System_WindowsProgramming"
+]
+
+[workspace]
+members = [
+    "winapi",
+    "inpout",
+    "iopl",
+    "beeper",
+    "nano_sleep"
+]
+
+[build-dependencies]
+embed-manifest = "1.4"
+
+[dependencies]
+
+# Foreign:
+ctrlc = { version = "3.3", features = ["termination"] }
+wyhash = "0.5"
+rustfft = "6.1"
+find_peaks = "0.1"
+
+# Local:
+winapi = { path = "./winapi" }
+inpout = { path = "./inpout" }
+iopl = { path = "./iopl" }
+beeper = { path = "./beeper" }
+nano_sleep = { path = "./nano_sleep" }
+note = { path = "./note" }

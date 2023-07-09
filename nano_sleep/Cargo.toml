@@ -1,0 +1,8 @@
+[package]
+name = "nano_sleep"
+version = "0.1.0"
+edition = "2021"
+authors = [ "Alexander Eremeev @ HoShiMin <aleksanderem@yandex.ru>" ]
+
+[dependencies]
+raw-cpuid = "11"
