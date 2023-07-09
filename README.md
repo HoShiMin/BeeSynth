@@ -524,8 +524,8 @@ This approach gives us a way to emulate polyphonic sound.
 ---
 
 ### <a id="time-management"></a> ⏱️ Time management
-When playing a sound, we need to make delays between switching the state of the speaker. Let's calculate the minimum precision required for switching between samples in a typical WAV file with the discretization frequency of 44100 Hz:
-$$ \frac{1}{44100} \approx 22.6 \space \mu s $$
+When playing a sound, we need to make delays between switching the state of the speaker. Let's calculate the minimum precision required for switching between samples in a typical WAV file with the discretization frequency of 44100 Hz: 
+$$\frac{1}{44100} \approx 22.6 \space \mu s$$
 
 So, to implement fast and precision delays we need more than [`Sleep()`](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep) that has a precision of 1 ms. If we go deeper, we can use `NtDelayExecution()` from `ntdll.dll` which has the following prototype:
 ```cpp
