@@ -48,7 +48,7 @@ Table of contents:
 
 Almost everyone desktop computers have a PC speaker. It's a small piezoelectric buzzer that you hear every time your PC turns on, that signals that [Power-On Self Test](https://en.wikipedia.org/wiki/Power-on_self-test) is completed.  
 
-<p style="text-align: center;"><img src="images/speaker.webp"/></p>
+<p align="center"><img src="images/speaker.webp"/></p>
 
 It is controlled via [I/O ports](https://wiki.osdev.org/I/O_Ports), and its membrane can have only two positions: raised when the voltage is applied to the membrane, and lowered when the voltage is removed. Using I/O ports we can control the position of the membrane and thus generate sound.
 
@@ -100,7 +100,7 @@ Bits        Usage
 The only channel that connected to the PC speaker is the Channel 2.  
 We need to select the Channel 2, set the Access mode to lobyte/hibyte to work with 16-bit divisor and set the Operating mode to square wave generator.  
 So, we need to write `0xB6` or `0b10_11_111_0` to the control port `0x43`:
-```x86asm
+```asm
 ;  10_11_111_0 = 0xB6
 ;  ^  ^  ^   ^
 ;  |  |  |   Use 16-bit binary for a divisor
@@ -112,7 +112,7 @@ mov al, 0xB6
 out 0x43, al
 ```
 Now we need to write the divisor to the Channel 2 data port `0x42` in two steps: the low part and the high part:
-```x86asm
+```asm
 divisor dw 0BBAAh  ; 16-bit divisor
 
 mov ax, divisor    ; al = divisor.low, ah = divisor.high
@@ -140,7 +140,7 @@ Bits        Usage
                 1 = Counter 2 is enabled
 ```
 We interested in the bits 1 and 0. We need to set them to 1 to enable the PIT timer and apply voltage to the PC speaker:
-```x86asm
+```asm
 ; Enable the speaker by enabling the PIT timer
 ; and applying voltage to the PC speaker:
 ; port[0x61] |= 0b11
@@ -163,7 +163,7 @@ With this code, we turned on the frequency generator in PIT that was connected t
 
 ### <a id="direct-membrane-control"></a> ⇅ Direct membrane control
 The second way is to control the position of the PC speaker's membrane directly by applying and removing voltage manually using the bit 1 (_Speaker Data Enable_) in the control port `0x61`:
-```x86asm
+```asm
 ; Raise the membrane:
 ; port[0x61] |= 0b10
 
@@ -438,24 +438,24 @@ Well, now we have a way to control a PC speaker from an application. Now we need
 <a id="pcm"></a>
 
 The most convenient format is [WAV](https://en.wikipedia.org/wiki/WAV). You can find specification on a format [here](http://soundfile.sapp.org/doc/WaveFormat/) or [here](https://www.mmsp.ece.mcgill.ca/Documents/AudioFormats/WAVE/WAVE.html). It contains an array of samples encoded with [Pulse-Code Modulation (PCM)](https://en.wikipedia.org/wiki/Pulse-code_modulation). In other words, each sample represents an amplitude of the speaker in a particular moment of time.
-<p style="text-align: center;"><img src="images/pcm.svg"/></p>
+<p align="center"><img src="images/pcm.svg"/></p>
 
 Howerer, this format is only applicable to the real speaker whose diaphragm position can be controlled flexibly by changing the voltage amplitude. But the PC speaker is a simple piezoelectric buzzer which can only be turned on and off: there are no intermediate states. So, we need to convert the PCM amplitudes into a sequence of on/off samples.
 
 The first obvious way is to compare a sample with zero. If the sample is greater than zero - treat it as a speaker's up position, if the sample is lower than zero - treat as down.
 
 It will look like this: the blue line is an original PCM signal, the green line is a signal that we will send to the speaker.
-<p style="text-align: center;"><img src="images/simple.svg"/></p>
+<p align="center"><img src="images/simple.svg"/></p>
 We can see how much information we loss in this approach.
 
 But we can do smarter. We can switch the speaker's state if the current amplitude differs from the amplitude in the past switching by more than a given percentage. It will look like this:
-<p style="text-align: center;"><img src="images/differential.svg"/></p>
+<p align="center"><img src="images/differential.svg"/></p>
 We see that this approach brings a lot more information than a previous way, so the sound will have a better quality.
 
 <a id="fourier-expansion"></a>
 
-But there is another way to play sound. As we know, each finite periodic function can be represented as a sum of harmonics - sine waves with different frequencies and amplitudes. This representation is called [Fourier series expansion](https://en.wikipedia.org/wiki/Fourier_series):
-$$ \hat{f}(\omega)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} f(x)e^{-ix\omega}\, dx $$
+But there is another way to play sound. As we know, each finite periodic function can be represented as a sum of harmonics - sine waves with different frequencies and amplitudes. This representation is called [Fourier series expansion](https://en.wikipedia.org/wiki/Fourier_series):  
+$$\hat{f}(\omega)=\frac{1}{\sqrt{2\pi}}\int_{-\infty}^{\infty} f(x)e^{-ix\omega}\, dx$$
 
 Where:  
 $f(x)$ is an infinite periodic function which we want to expand.  
@@ -466,19 +466,19 @@ Expanding the function into a Fourier series, we can get a set of harmonics (fre
 
 We also remember that the PC speaker has a regime in which we can set the sound frequency using the PIT timer. So, we can get the dominant frequencies at any given time in our signal and play them back on the speaker.
 
-As the wave is not infinite function that is requried by analitical solution, we can use [discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) in which the integral is replaced by a finite sum:
-$$ X_k = \sum_{n=0}^{N-1} x_n e^{\frac{-i 2 \pi}{N} k n}=\sum_{n=0}^{N-1} x_n [\cos(2 \pi k n / N) - i \sin(2 \pi k n / N)], \space\space\space\space k = 0, \ldots, N-1. $$
+As the wave is not infinite function that is requried by analitical solution, we can use [discrete Fourier transform](https://en.wikipedia.org/wiki/Discrete_Fourier_transform) in which the integral is replaced by a finite sum:  
+$$X_k = \sum_{n=0}^{N-1} x_n e^{\frac{-i 2 \pi}{N} k n}=\sum_{n=0}^{N-1} x_n [\cos(2 \pi k n / N) - i \sin(2 \pi k n / N)], \space\space\space\space k = 0, \ldots, N-1.$$
 
 Where:  
 $N$ - number of samples.  
 $x_n$ - value of the signal at time $n$  
 $X_k$ - value of the Fourier transform at frequency $k$.  
 
-The second part follows from the [Euler's formula](https://en.wikipedia.org/wiki/Euler%2527s_formula):
-$$ e^{ix} = \cos(x) + i \sin(x) $$
+The second part follows from the [Euler's formula](https://en.wikipedia.org/wiki/Euler%2527s_formula):  
+$$e^{ix} = \cos(x) + i \sin(x)$$
 
-In order to apply this to our wave file we need to create a sampling window with a given size $N$ and apply the discrete Fourier transform to it. In result we will get an array with size $N$ where each element is a complex amplitude of the frequency according to the position of the element. The frequency of the entry is calculated as follows:
-$$ f_k = \frac{k}{N} \cdot f_s $$
+In order to apply this to our wave file we need to create a sampling window with a given size $N$ and apply the discrete Fourier transform to it. In result we will get an array with size $N$ where each element is a complex amplitude of the frequency according to the position of the element. The frequency of the entry is calculated as follows:  
+$$f_k = \frac{k}{N} \cdot f_s$$
 
 Where:  
 $f_k$ - frequency of the element.  
@@ -489,12 +489,12 @@ $f_s$ - sampling frequency (e.g. 44100 Hz for a typical WAV file).
 Programmatically, we can calculate the discrete Fourier transform using the [Fast Fourier Transform (FFT)](https://en.wikipedia.org/wiki/Fast_Fourier_transform) algorithm.
 
 As a result, we will get an array of complex amplitudes that have contributon to the audio signal in the selected sampling window. Complex numbers have two parts: real and imaginary. The real part of the frequency is the amplitude of the sine part, and the imaginary part is the amplitude of the cosine part. Using the [complex plane](https://en.wikipedia.org/wiki/Complex_plane) and the [Pythagorean theorem](https://en.wikipedia.org/wiki/Pythagorean_theorem), we can calculate the modulus of a complex number:
-<p style="text-align: center;"><img src="images/complex-plane.svg"/></p>
+<p align="center"><img src="images/complex-plane.svg"/></p>
 
-$$ |z| = \sqrt{\operatorname{Re}(z)^2 + \operatorname{Im}(z)^2} $$
+$$|z| = \sqrt{Re(z)^2 + Im(z)^2}$$
 
-Finally, to convert the modulus of a complex amplitude into a habitual [decibels](https://en.wikipedia.org/wiki/Decibel), we can use the following formula:
-$$ dB = 20 \cdot \log_{10}(|z|) $$
+Finally, to convert the modulus of a complex amplitude into a habitual [decibels](https://en.wikipedia.org/wiki/Decibel), we can use the following formula:  
+$$dB = 20 \cdot \log_{10}(|z|)$$
 
 We can demonstrate this.  
 Let's generate a periodic signal in [Wolfram Mathematica](https://www.wolfram.com/mathematica/):
@@ -503,7 +503,7 @@ signal[x_] := 0.8 Sin[0.9 x] + 0.3 Sin[0.6 x ] + 0.5 Cos[0.3 x] + 0.3 Sin[x^2];
 wave = Table[signal[x], {x, 0, 512, 1}];
 ListPlot[{wave}, Joined -> True, PlotStyle -> Line, PlotRange -> All]
 ```
-<p style="text-align: center;"><img src="images/wave.svg"/></p>
+<p align="center"><img src="images/wave.svg"/></p>
 
 And perform expansion into a Fourier series, which will give us the spectrum:
 ```mathematica
@@ -511,7 +511,7 @@ fourier = Fourier[wave];
 fourier = Take[fourier, {1, Floor[Length[fourier] / 2], 1}];
 ListPlot[Sqrt[(Re[fourier])^2 + (Im[fourier])^2], Joined -> True, PlotStyle -> Line, PlotRange -> All, Filling -> Axis]
 ```
-<p style="text-align: center;"><img src="images/spectrum.svg"/></p>
+<p align="center"><img src="images/spectrum.svg"/></p>
 These peaks are the dominant frequencies in the sampling window. Knowing this, we can set the PIT timer to the frequency of the highest peak and play it on the speaker: it will be a mono sound.
 
 <a id="multichannel-approach"></a>
@@ -726,4 +726,4 @@ We have collected all the necessary components to build our speaker synthesizer:
 
 Thank you for your attention and good luck!
 
-<p style="text-align: center;"><img src="images/thats-all.webp"/></p>
+<p align="center"><img src="images/thats-all.webp"/></p>
