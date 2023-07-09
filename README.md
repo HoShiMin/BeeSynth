@@ -517,7 +517,7 @@ These peaks are the dominant frequencies in the sampling window. Knowing this, w
 <a id="multichannel-approach"></a>
 
 At the same time we can extract some of the most valueable frequencies and put them into several channels. We can switch them quickly one by one, like this:
-<p style="text-align: center;"><img src="images/multichannel.svg"/></p>
+<p align="center"><img src="images/multichannel.svg"/></p>
 
 This approach gives us a way to emulate polyphonic sound.
 
@@ -582,7 +582,7 @@ Hertz getIntelBaseCpuFrequency() noexcept
 }
 ```
 But there is no corresponding CPUD leaf in AMD, so we have to calculate the frequency ourselves. We can poll for some known time and meause ticks delta between the beginning and the end of the polling. Knowing the polling time and the number of ticks we can calculate the CPU frequency. We do not use [`Sleep()`](https://learn.microsoft.com/en-us/windows/win32/api/synchapi/nf-synchapi-sleep) which calls `NtDelayExecution()` internally as it performs syscall that impacts on measurements, but [`GetTickCount()`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-gettickcount) and [`GetTickCount64()`](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/nf-sysinfoapi-gettickcount64) read the current tick count directly from the kernel shared memory [`KUSER_SHARED_DATA`](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntddk/ns-ntddk-kuser_shared_data):
-```x86asm
+```asm
 ; ULONGLONG __stdcall GetTickCount64Kernel32()
 ; {
 ;     return KUSER_SHARED_DATA->TickCountLow * KUSER_SHARED_DATA->TickCountMultiplier;
