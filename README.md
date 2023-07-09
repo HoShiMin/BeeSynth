@@ -255,7 +255,7 @@ The scheme will be as follows:
 2. Make "anchors" in the context of our suspended thread so we know what to look for. It can be achived using the [`SetThreadContext()`](https://learn.microsoft.com/en-us/windows/win32/api/processthreadsapi/nf-processthreadsapi-setthreadcontext) function. We can assign the values of some registers to known magic values, which we will look for later.
 3. Enumerate all physical RAM regions and map them into the usermode address space of our process. The RAM physical address space is not continuous: it is interspersed with areas reserved for I/O space for devices, so access to these regions can cause [unforeseen consequences](https://www.youtube.com/watch?v=RJN19V9-8hs). Physical memory ranges can be found in the registry key `HKEY_LOCAL_MACHINE\HARDWARE\RESOURCEMAP\System Resources\Physical Memory\.Translated`, which consists of [`CM_RESOURCE_LIST`](https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/ns-wdm-_cm_resource_list) structures.
 4. Map each physical region into a userspace and find the `KTRAP_FRAME` structure in it using anchors (magic values) from the second step.
-5. One we found the `KTRAP_FRAME` structure, we can patch it as described above, unmap the region and resume the thread.
+5. Once we found the `KTRAP_FRAME` structure, we can patch it as described above, unmap the region and resume the thread.
 ```cpp
 //
 // Pseudocode, error checking is omitted for the simplicity.
