@@ -482,7 +482,7 @@ $$f_k = \frac{k}{N} \cdot f_s$$
 
 Where:  
 $f_k$ - frequency of the element.  
-$k$ - position of the element, $ k = 0,...,N-1 $.  
+$k$ - position of the element, $k = 0,...,N-1$.  
 $N$ - size of the sampling window (e.g. 4096).  
 $f_s$ - sampling frequency (e.g. 44100 Hz for a typical WAV file).  
 
