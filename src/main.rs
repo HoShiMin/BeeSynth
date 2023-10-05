@@ -196,7 +196,7 @@ fn play_data(mut samples: filter::Data, play_params: &PlayParams) -> Result<(), 
         BeeperType::Iopl => {
             let patch_status = iopl::windows::Patcher::new(&inpout).patch(iopl::level::Level::Ring3);
             match patch_status {
-                Ok(_) => (),
+                Ok(()) => (),
                 Err(err) => {
                     eprintln!("Unable to patch iopl: {err}");
                     return Err(());

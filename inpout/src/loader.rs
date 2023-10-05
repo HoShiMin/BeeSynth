@@ -114,7 +114,7 @@ impl crate::Inpout {
                     Err(_) => State::ExtractFile
                 },
                 State::StartService(mut svc) => match svc.start() {
-                    Ok(_) => State::OpenDevice,
+                    Ok(()) => State::OpenDevice,
                     Err(_) => State::DeleteService(svc) // Attempt to delete and reinstall the service
                 },
                 State::OpenDevice => match Self::open_device() {
@@ -122,7 +122,7 @@ impl crate::Inpout {
                     Err(_) => State::OpenService,
                 },
                 State::DeleteService(mut svc) => match svc.delete() {
-                    Ok(_) => State::ExtractFile,
+                    Ok(()) => State::ExtractFile,
                     Err(err) => State::Failure(InpoutError::DeleteService(err))
                 }
                 State::Success(inpout) => return Ok(inpout),

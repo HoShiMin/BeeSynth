@@ -103,7 +103,7 @@ impl Event {
         let wait_status = unsafe { WaitForMultipleObjects(objects, wait_all, timeout_msec) };
 
         #[allow(clippy::cast_possible_truncation)]
-        if (wait_status.0 >= WAIT_OBJECT_0.0) && (wait_status.0 < WAIT_OBJECT_0.0 + objects.len() as u32) {
+        if wait_status.0 < WAIT_OBJECT_0.0 + objects.len() as u32 {
             WaitStatus::Signaled(wait_status.0 - WAIT_OBJECT_0.0)
         } else {
             match wait_status {

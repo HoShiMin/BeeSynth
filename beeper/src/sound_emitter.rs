@@ -42,7 +42,7 @@ impl BeeperFrequency {
     #[inline]
     #[must_use]
     pub fn new(freq_hz: Hertz) -> Option<Self> {
-        if (freq_hz >= Self::MIN.0) && (freq_hz <= Self::MAX.0) {
+        if (Self::MIN.0..=Self::MAX.0).contains(&freq_hz) {
             Some(Self(freq_hz))
         } else {
             None

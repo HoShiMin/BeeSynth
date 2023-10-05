@@ -101,8 +101,6 @@ impl Interface for crate::Inpout {
     /// 
     /// Returns an error in case of invalid mapping info, in case of failed driver request or in case of unsupported platform.
     fn unmap_physical_memory(&self, mapped: PhysMapping) -> Result<(), Error> {
-        let mapped = mapped;
-
         if cfg!(target_arch = "x86") {
             let os_arch = arch::os();
             return match os_arch {
